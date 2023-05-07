@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'dart:math';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:video_editor/video_editor.dart';
 
 const kDefaultSelectedColor = Color(0xffffcc00);
@@ -60,10 +64,10 @@ Rect resizeCropToRatio(Size layout, Rect crop, double r) {
 
 /// Returns a translated [Rect] that fit [layout] size
 Rect translateRectIntoBounds(Size layout, Rect rect) {
-  final double translateX = (rect.left < 0 ? rect.left.abs() : 0) +
-      (rect.right > layout.width ? layout.width - rect.right : 0);
-  final double translateY = (rect.top < 0 ? rect.top.abs() : 0) +
-      (rect.bottom > layout.height ? layout.height - rect.bottom : 0);
+  final double translateX =
+      (rect.left < 0 ? rect.left.abs() : 0) + (rect.right > layout.width ? layout.width - rect.right : 0);
+  final double translateY =
+      (rect.top < 0 ? rect.top.abs() : 0) + (rect.bottom > layout.height ? layout.height - rect.bottom : 0);
 
   if (translateX != 0 || translateY != 0) {
     return rect.translate(translateX, translateY);
@@ -72,13 +76,19 @@ Rect translateRectIntoBounds(Size layout, Rect rect) {
   return rect;
 }
 
+Future<File> downloadVideoFromUrl(String url) async {
+  final extesion = url.split('.').last;
+  final response = await Dio().get(url, options: Options(responseType: ResponseType.bytes));
+  final documentDirectory = await getApplicationDocumentsDirectory();
+  final file = File(join(documentDirectory.path, '${DateTime.now()}.$extesion'));
+  return file.writeAsBytes(response.data);
+}
+
 /// Return the scale for [rect] to fit [layout]
-double scaleToSize(Size layout, Rect rect) =>
-    min(layout.width / rect.width, layout.height / rect.height);
+double scaleToSize(Size layout, Rect rect) => min(layout.width / rect.width, layout.height / rect.height);
 
 /// Return the scale for [rect] to not be smaller [layout]
-double scaleToSizeMax(Size layout, Rect rect) =>
-    max(layout.width / rect.width, layout.height / rect.height);
+double scaleToSizeMax(Size layout, Rect rect) => max(layout.width / rect.width, layout.height / rect.height);
 
 /// Calculate crop [Rect] area
 /// depending of [controller] min and max crop values and the size of the layout
@@ -116,10 +126,7 @@ int getBestIndex(int max, int length, int index) =>
 /// Returns `true` if [rect] is left and top are bigger than 0
 /// and if right and bottom are smaller than [size] width and height
 bool isRectContained(Size size, Rect rect) =>
-    rect.left >= 0 &&
-    rect.top >= 0 &&
-    rect.right <= size.width &&
-    rect.bottom <= size.height;
+    rect.left >= 0 && rect.top >= 0 && rect.right <= size.width && rect.bottom <= size.height;
 
 /// Returns opposite aspect ratio
 ///

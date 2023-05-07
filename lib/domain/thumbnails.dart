@@ -10,7 +10,7 @@ Stream<List<Uint8List>> generateTrimThumbnails(
   required int quantity,
   int quality = 10,
 }) async* {
-  final String path = controller.file.path;
+  final String path = controller.file!.path;
   final double eachPart = controller.videoDuration.inMilliseconds / quantity;
   List<Uint8List> byteList = [];
 
@@ -38,20 +38,16 @@ Stream<List<CoverData>> generateCoverThumbnails(
   required int quantity,
   int quality = 10,
 }) async* {
-  final int duration = controller.isTrimmed
-      ? controller.trimmedDuration.inMilliseconds
-      : controller.videoDuration.inMilliseconds;
+  final int duration =
+      controller.isTrimmed ? controller.trimmedDuration.inMilliseconds : controller.videoDuration.inMilliseconds;
   final double eachPart = duration / quantity;
   List<CoverData> byteList = [];
 
   for (int i = 0; i < quantity; i++) {
     try {
       final CoverData bytes = await generateSingleCoverThumbnail(
-        controller.file.path,
-        timeMs: (controller.isTrimmed
-                ? (eachPart * i) + controller.startTrim.inMilliseconds
-                : (eachPart * i))
-            .toInt(),
+        controller.file!.path,
+        timeMs: (controller.isTrimmed ? (eachPart * i) + controller.startTrim.inMilliseconds : (eachPart * i)).toInt(),
         quality: quality,
       );
 

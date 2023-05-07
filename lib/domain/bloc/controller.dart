@@ -60,7 +60,7 @@ class VideoEditorController extends ChangeNotifier {
   final CropGridStyle cropStyle;
 
   /// Video from [File].
-  final File file;
+  late final File? file;
 
   /// Constructs a [VideoEditorController] that edits a video from a file.
   ///
@@ -74,10 +74,26 @@ class VideoEditorController extends ChangeNotifier {
     TrimSliderStyle? trimStyle,
   })  : _video = VideoPlayerController.file(File(
           // https://github.com/flutter/flutter/issues/40429#issuecomment-549746165
-          Platform.isIOS ? Uri.encodeFull(file.path) : file.path,
+          Platform.isIOS ? Uri.encodeFull(file!.path) : file!.path,
         )),
         trimStyle = trimStyle ?? TrimSliderStyle(),
         assert(maxDuration > minDuration, 'The maximum duration must be bigger than the minimum duration');
+
+  /// Constructs a [VideoEditorController] that edits a video from a file.
+  ///
+  /// The [path] argument must not be null.
+  VideoEditorController.network(
+    String path, {
+    this.maxDuration = Duration.zero,
+    this.minDuration = Duration.zero,
+    this.coverStyle = const CoverSelectionStyle(),
+    this.cropStyle = const CropGridStyle(),
+    TrimSliderStyle? trimStyle,
+  })  : _video = VideoPlayerController.network(path),
+        trimStyle = trimStyle ?? TrimSliderStyle(),
+        assert(maxDuration > minDuration, 'The maximum duration must be bigger than the minimum duration') {
+    downloadVideo(path);
+  }
 
   int _rotation = 0;
   bool _isTrimming = false;
@@ -169,6 +185,10 @@ class VideoEditorController extends ChangeNotifier {
     if (preferredCropAspectRatio == value) return;
     _preferredCropAspectRatio = value;
     notifyListeners();
+  }
+
+  Future<void> downloadVideo(String url) async {
+    file = await downloadVideoFromUrl(url);
   }
 
   /// Set [preferredCropAspectRatio] to the current cropped area ratio
@@ -393,7 +413,7 @@ class VideoEditorController extends ChangeNotifier {
   /// Generate cover at [startTrim] time in milliseconds
   void generateDefaultCoverThumbnail() async {
     final defaultCover = await generateSingleCoverThumbnail(
-      file.path,
+      file!.path,
       timeMs: startTrim.inMilliseconds,
     );
     updateSelectedCover(defaultCover);
@@ -452,7 +472,7 @@ class VideoEditorController extends ChangeNotifier {
 
   /// Return the metadata of the video [file] using Ffprobe
   Future<void> getMetaData({required void Function(Map<dynamic, dynamic>? metadata) onCompleted}) async {
-    await FFprobeKit.getMediaInformationAsync(file.path, (session) async {
+    await FFprobeKit.getMediaInformationAsync(file!.path, (session) async {
       final information = session.getMediaInformation();
       onCompleted(information?.getAllProperties());
     });
@@ -538,7 +558,7 @@ class VideoEditorController extends ChangeNotifier {
     VideoExportPreset preset = VideoExportPreset.none,
     bool isFiltersEnabled = true,
   }) async {
-    final String videoPath = file.path;
+    final String videoPath = file!.path;
     final String outputPath = await _getOutputPath(
       filePath: videoPath,
       name: name,
@@ -637,7 +657,7 @@ class VideoEditorController extends ChangeNotifier {
     return await VideoThumbnail.thumbnailFile(
       imageFormat: ImageFormat.JPEG,
       thumbnailPath: (await getTemporaryDirectory()).path,
-      video: file.path,
+      video: file!.path,
       timeMs: selectedCoverVal?.timeMs ?? startTrim.inMilliseconds,
       quality: quality,
     );
