@@ -80,7 +80,7 @@ Future<File> downloadVideoFromUrl(String url) async {
   final extesion = url.split('.').last;
   final response = await Dio().get(url, options: Options(responseType: ResponseType.bytes));
   final documentDirectory = await getApplicationDocumentsDirectory();
-  final file = File(join(documentDirectory.path, '${DateTime.now()}.$extesion'));
+  final file = File(join(documentDirectory.path, '${DateTime.now().millisecondsSinceEpoch}.$extesion'));
   return file.writeAsBytes(response.data);
 }
 
