@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit_config.dart';
@@ -58,6 +59,9 @@ class VideoEditorController extends ChangeNotifier {
 
   /// Style for [CropGridViewer]
   final CropGridStyle cropStyle;
+
+  /// Future that represents if file was initialied.
+  final Completer<void> fileInitialized = Completer<void>();
 
   /// Video from [File].
   late final File? file;
@@ -189,6 +193,7 @@ class VideoEditorController extends ChangeNotifier {
 
   Future<void> downloadVideo(String url) async {
     file = await downloadVideoFromUrl(url);
+    fileInitialized.complete();
   }
 
   /// Set [preferredCropAspectRatio] to the current cropped area ratio
