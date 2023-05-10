@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit_config.dart';
 import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter/log_callback.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:ffmpeg_kit_flutter/statistics.dart';
 import 'package:path/path.dart' as path;
@@ -562,6 +563,7 @@ class VideoEditorController extends ChangeNotifier {
     void Function(Statistics, double)? onProgress,
     VideoExportPreset preset = VideoExportPreset.none,
     bool isFiltersEnabled = true,
+    LogCallback? logCallback,
   }) async {
     final String videoPath = file!.path;
     final String outputPath = await _getOutputPath(
@@ -600,7 +602,7 @@ class VideoEditorController extends ChangeNotifier {
           return;
         }
       },
-      null,
+      logCallback,
       onProgress != null
           ? (stats) {
               // Progress value of encoded video
