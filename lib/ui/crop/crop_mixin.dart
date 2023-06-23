@@ -12,8 +12,7 @@ import 'package:video_editor/ui/video_viewer.dart';
 
 mixin CropPreviewMixin<T extends StatefulWidget> on State<T> {
   final ValueNotifier<Rect> rect = ValueNotifier<Rect>(Rect.zero);
-  final ValueNotifier<TransformData> transform =
-      ValueNotifier<TransformData>(const TransformData());
+  final ValueNotifier<TransformData> transform = ValueNotifier<TransformData>(const TransformData());
 
   Size viewerSize = Size.zero;
   Size layout = Size.zero;
@@ -33,13 +32,10 @@ mixin CropPreviewMixin<T extends StatefulWidget> on State<T> {
     bool shouldFlipped = false,
   }) {
     if (viewerSize == Size.zero) return Size.zero;
-    final videoRatio = controller.video.value.aspectRatio;
-    final size = Size(viewerSize.width - margin.horizontal,
-        viewerSize.height - margin.vertical);
+    final videoRatio = controller.betterPlayerController.videoPlayerController!.value.aspectRatio;
+    final size = Size(viewerSize.width - margin.horizontal, viewerSize.height - margin.vertical);
     if (shouldFlipped) {
-      return computeSizeWithRatio(videoRatio > 1 ? size.flipped : size,
-              getOppositeRatio(videoRatio))
-          .flipped;
+      return computeSizeWithRatio(videoRatio > 1 ? size.flipped : size, getOppositeRatio(videoRatio)).flipped;
     }
     return computeSizeWithRatio(size, videoRatio);
   }
@@ -89,8 +85,7 @@ mixin CropPreviewMixin<T extends StatefulWidget> on State<T> {
         child: ImageViewer(
           controller: controller,
           bytes: bytes,
-          child:
-              buildPaint(controller, showGrid: false, showCenterRects: false),
+          child: buildPaint(controller, showGrid: false, showCenterRects: false),
         ),
       ),
     );
@@ -132,8 +127,7 @@ mixin CropPreviewMixin<T extends StatefulWidget> on State<T> {
 
       return ValueListenableBuilder(
         valueListenable: transform,
-        builder: (_, TransformData transform, __) =>
-            buildView(context, transform),
+        builder: (_, TransformData transform, __) => buildView(context, transform),
       );
     });
   }
