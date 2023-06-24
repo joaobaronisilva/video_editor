@@ -104,6 +104,7 @@ class VideoEditorController extends ChangeNotifier {
   })  : _dataSource = BetterPlayerDataSource.network(path),
         trimStyle = trimStyle ?? TrimSliderStyle(),
         assert(maxDuration > minDuration, 'The maximum duration must be bigger than the minimum duration') {
+    print('VideoPath: $path');
     downloadVideo(path);
   }
 

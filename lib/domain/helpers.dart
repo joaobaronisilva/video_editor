@@ -77,10 +77,9 @@ Rect translateRectIntoBounds(Size layout, Rect rect) {
 }
 
 Future<File> downloadVideoFromUrl(String url) async {
-  final extesion = url.split('.').last;
   final response = await Dio().get(url, options: Options(responseType: ResponseType.bytes));
   final documentDirectory = await getApplicationDocumentsDirectory();
-  final file = File(join(documentDirectory.path, '${DateTime.now().millisecondsSinceEpoch}.$extesion'));
+  final file = File(join(documentDirectory.path, '${DateTime.now().millisecondsSinceEpoch}.mp4'));
   return file.writeAsBytes(response.data);
 }
 
